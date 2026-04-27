@@ -18,7 +18,7 @@ mcp_servers:
   - name: brave_search
     transport: stdio
     command: npx
-    args: ["-y", "@modelcontextprotocol/server-brave-search"]
+    args: ["-y", "@brave/brave-search-mcp-server"]
     env_vars: [BRAVE_API_KEY]
     enabled_tools:
       - web_search
