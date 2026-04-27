@@ -6,10 +6,10 @@ A registry of agent skills compatible with the skill framework.
 
 | Name | Description |
 |---|---|
-| `code-reviewer` | Static analysis: linting, security scan, complexity |
-| `knowledge-retriever` | Internal docs (Notion) + Codex native web search |
-| `skill-publish` | Validate, test, and publish a skill to this registry |
-| `testcase-skill` | Generate and run test cases for functions and modules |
+| `code-reviewer` | Reviews code for quality, security issues, and style violations. |
+| `knowledge-retriever` | Retrieves relevant information from internal documentation and the web to answer engineering questions. |
+| `skill-publish` | Validates, tests, and publishes a skill to a registry. |
+| `testcase-skill` | Generates and runs test cases for a given function or module. |
 
 ## Usage
 
