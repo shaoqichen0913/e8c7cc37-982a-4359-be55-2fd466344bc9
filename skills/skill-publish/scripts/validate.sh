@@ -12,8 +12,8 @@ SKILL_MD="$SKILL_PATH/SKILL.md"
 ERRORS=0
 WARNINGS=0
 
-fail() { echo "  ✗ $*" >&2; ((ERRORS++)); }
-warn() { echo "  ⚠ $*"; ((WARNINGS++)); }
+fail() { echo "  ✗ $*" >&2; ERRORS=$((ERRORS + 1)); }
+warn() { echo "  ⚠ $*"; WARNINGS=$((WARNINGS + 1)); }
 ok()   { echo "  ✓ $*"; }
 
 echo ""
@@ -59,14 +59,27 @@ fi
 NAME=$(grep -m1 '^name:' "$SKILL_MD" | sed 's/name:[[:space:]]*//')
 if [[ -z "$NAME" ]]; then
   fail "name field is missing in frontmatter"
-elif [[ "$NAME" =~ [A-Z_\ ] ]]; then
-  fail "name '$NAME' must be kebab-case (lowercase, hyphens only)"
+elif [[ ! "$NAME" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
+  fail "name '$NAME' must be kebab-case (lowercase letters, digits, single hyphens, no leading/trailing hyphens)"
 else
   ok "name '$NAME' is kebab-case"
 fi
 
 # ── 4. Description length ────────────────────────────────────────────────────
-DESC=$(awk '/^description:/{found=1; next} found && /^[a-z]/{print; exit} found && /^  /{gsub(/^  /, ""); printf $0" "} /^[a-zA-Z]/ && found{exit}' "$SKILL_MD" | tr -d '\n')
+DESC=$(python3 - "$SKILL_MD" <<'PYEOF'
+import sys, re
+with open(sys.argv[1]) as f:
+    content = f.read()
+m = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
+fm = m.group(1) if m else ""
+block = re.search(r"^description:\s*>\n((?:[ \t]+.+\n?)+)", fm, re.MULTILINE)
+if block:
+    print(" ".join(l.strip() for l in block.group(1).splitlines() if l.strip()))
+else:
+    inline = re.search(r"^description:\s*(.+)", fm, re.MULTILINE)
+    print(inline.group(1).strip() if inline else "")
+PYEOF
+)
 DESC_LEN=${#DESC}
 if [[ $DESC_LEN -gt 200 ]]; then
   warn "description is $DESC_LEN chars (recommended: under 200)"

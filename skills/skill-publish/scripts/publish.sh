@@ -30,7 +30,20 @@ fi
 
 SKILL_MD="$SKILL_PATH/SKILL.md"
 SKILL_NAME=$(grep -m1 '^name:' "$SKILL_MD" | sed 's/name:[[:space:]]*//')
-SKILL_DESC=$(grep -m1 '^description:' "$SKILL_MD" | sed 's/description:[[:space:]]*//' | tr -d '>' | sed 's/^[[:space:]]*//')
+SKILL_DESC=$(python3 - "$SKILL_MD" <<'PYEOF'
+import sys, re
+with open(sys.argv[1]) as f:
+    content = f.read()
+m = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
+fm = m.group(1) if m else ""
+block = re.search(r"^description:\s*>\n((?:[ \t]+.+\n?)+)", fm, re.MULTILINE)
+if block:
+    print(" ".join(l.strip() for l in block.group(1).splitlines() if l.strip()))
+else:
+    inline = re.search(r"^description:\s*(.+)", fm, re.MULTILINE)
+    print(inline.group(1).strip() if inline else "")
+PYEOF
+)
 VERSION=$(grep -m1 'version:' "$SKILL_MD" | sed 's/.*version:[[:space:]]*//' | tr -d '"' || echo "")
 
 if [[ -z "$SKILL_NAME" ]]; then
@@ -57,7 +70,7 @@ cd "$TMP_DIR/registry"
 git checkout -B "$BRANCH"
 
 # ── Copy skill folder ────────────────────────────────────────────────────────
-DEST="$TMP_DIR/registry/$SKILL_NAME"
+DEST="$TMP_DIR/registry/skills/$SKILL_NAME"
 IS_UPDATE=false
 if [[ -d "$DEST" ]]; then
   IS_UPDATE=true
@@ -87,7 +100,7 @@ index_path, name, desc = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(index_path) as f:
     entries = json.load(f)
 entries = [e for e in entries if e.get("name") != name]
-entries.append({"name": name, "description": desc.strip(), "path": name})
+entries.append({"name": name, "description": desc.strip(), "path": f"skills/{name}"})
 entries.sort(key=lambda e: e["name"])
 with open(index_path, "w") as f:
     json.dump(entries, f, indent=2)
@@ -100,17 +113,45 @@ echo "  Updated index.json"
 git add .
 git diff --cached --stat
 
-ACTION=$( [[ "$IS_UPDATE" == true ]] && echo "update" || echo "add" )
-COMMIT_MSG="$ACTION: $SKILL_NAME skill"
-[[ -n "$VERSION" ]] && COMMIT_MSG="$COMMIT_MSG (v$VERSION)"
-git commit -m "$COMMIT_MSG" --quiet
+if [[ "$IS_UPDATE" == true ]]; then
+  # Version range in subject
+  if [[ -n "$PREV_VERSION" && -n "$VERSION" && "$PREV_VERSION" != "$VERSION" ]]; then
+    COMMIT_SUBJECT="update: $SKILL_NAME (v$PREV_VERSION → v$VERSION)"
+  elif [[ -n "$VERSION" ]]; then
+    COMMIT_SUBJECT="update: $SKILL_NAME (v$VERSION)"
+  else
+    COMMIT_SUBJECT="update: $SKILL_NAME"
+  fi
+  # Body: list changed files relative to skill root (index.json excluded)
+  CHANGED=$(git diff --cached --name-only | grep "^skills/$SKILL_NAME/" | sed "s|^skills/$SKILL_NAME/||")
+  if [[ -n "$CHANGED" ]]; then
+    COMMIT_BODY="$(echo "$CHANGED" | sed 's/^/- /')"
+    git commit -m "$COMMIT_SUBJECT" -m "$COMMIT_BODY" --quiet
+  else
+    git commit -m "$COMMIT_SUBJECT" --quiet
+  fi
+else
+  COMMIT_MSG="add: $SKILL_NAME"
+  [[ -n "$VERSION" ]] && COMMIT_MSG="$COMMIT_MSG (v$VERSION)"
+  git commit -m "$COMMIT_MSG" --quiet
+fi
 
 # ── Push branch ──────────────────────────────────────────────────────────────
-git push --force-with-lease origin "$BRANCH" --quiet
+git push --force origin "$BRANCH" --quiet
 
 # ── Open PR ──────────────────────────────────────────────────────────────────
-PR_TITLE="$( [[ "$IS_UPDATE" == true ]] && echo "Update" || echo "Add" ) skill: $SKILL_NAME"
-[[ -n "$VERSION" ]] && PR_TITLE="$PR_TITLE (v$VERSION)"
+if [[ "$IS_UPDATE" == true ]]; then
+  if [[ -n "$PREV_VERSION" && -n "$VERSION" && "$PREV_VERSION" != "$VERSION" ]]; then
+    PR_TITLE="Update skill: $SKILL_NAME (v$PREV_VERSION → v$VERSION)"
+  elif [[ -n "$VERSION" ]]; then
+    PR_TITLE="Update skill: $SKILL_NAME (v$VERSION)"
+  else
+    PR_TITLE="Update skill: $SKILL_NAME"
+  fi
+else
+  PR_TITLE="Add skill: $SKILL_NAME"
+  [[ -n "$VERSION" ]] && PR_TITLE="$PR_TITLE (v$VERSION)"
+fi
 
 PR_BODY="## Skill: \`$SKILL_NAME\`
 
