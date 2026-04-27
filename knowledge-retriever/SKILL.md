@@ -16,11 +16,10 @@ metadata:
   version: "1.0.0"
 mcp_servers:
   - name: brave_search
-    transport: http
-    url: https://api.search.brave.com/mcp/v1
-    auth:
-      type: bearer
-      token_env_var: BRAVE_API_KEY
+    transport: stdio
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-brave-search"]
+    env_vars: [BRAVE_API_KEY]
     enabled_tools:
       - web_search
       - summarize
