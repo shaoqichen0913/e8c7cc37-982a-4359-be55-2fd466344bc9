@@ -12,9 +12,14 @@ README_PATH = os.path.join(ROOT, "README.md")
 def extract_description(skill_path):
     skill_md = os.path.join(skill_path, "SKILL.md")
     if not os.path.exists(skill_md):
+        print(f"warning: SKILL.md not found at {skill_md}", file=__import__("sys").stderr)
         return ""
-    with open(skill_md) as f:
-        content = f.read()
+    try:
+        with open(skill_md) as f:
+            content = f.read()
+    except OSError as e:
+        print(f"warning: could not read {skill_md}: {e}", file=__import__("sys").stderr)
+        return ""
     m = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
     if not m:
         return ""
