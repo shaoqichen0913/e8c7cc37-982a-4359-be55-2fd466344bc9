@@ -2,12 +2,13 @@
 # publish.sh — push a skill to a feature branch and open a PR for review
 set -euo pipefail
 
-SKILL_PATH="${1:-}"
+SKILL_PATH=$(cd "${1:-}" 2>/dev/null && pwd || echo "")
 REGISTRY_REPO="${2:-${SKILL_REGISTRY_REPO:-}}"
 
 if [[ -z "$SKILL_PATH" ]]; then
   echo "Usage: publish.sh <skill-path> [<owner/repo>]" >&2
   echo "  or set SKILL_REGISTRY_REPO=<owner/repo>" >&2
+  echo "  skill-path must be an existing directory" >&2
   exit 1
 fi
 
