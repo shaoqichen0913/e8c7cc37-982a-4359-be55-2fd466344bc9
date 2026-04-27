@@ -14,7 +14,7 @@ compatibility:
 metadata:
   author: osapiens engineering
   category: development
-  version: "1.0.0"
+  version: "1.1.0"
 scripts:
   - name: lint
     path: scripts/lint.sh

@@ -1,7 +1,7 @@
 [
   {
     "name": "code-reviewer",
-    "description": "Reviews code for quality, security issues, and style violations using bundled scripts.",
+    "description": "Reviews code for quality, security issues, and style violations. Use this skill when asked to review, audit, check, or analyze code \u2014 including pull requests, individual files, or entire modules. Activates for queries like \"review this code\", \"check for security issues\", \"audit my PR\", \"find bugs in\", \"lint\", \"look for code smells\", or \"is this implementation correct\". Can also run static analysis scripts directly on local files.",
     "path": "skills/code-reviewer"
   },
   {
