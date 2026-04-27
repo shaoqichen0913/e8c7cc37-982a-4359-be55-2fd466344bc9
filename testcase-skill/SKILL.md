@@ -11,7 +11,7 @@ compatibility:
 metadata:
   author: test-user
   category: testing
-  version: "1.0.0"
+  version: "1.1.0"
 scripts:
   - name: run
     path: scripts/run.sh
@@ -51,4 +51,12 @@ Use the bundled `run` script to execute the test suite:
 scripts/run.sh [path]
 ```
 
-The script detects the test framework and runs accordingly.
+The script auto-detects the test framework and runs accordingly:
+
+| Project signal | Framework |
+|---|---|
+| `package.json` with vitest | `npx vitest run` |
+| `package.json` with jest | `npx jest` |
+| `package.json` (other) | `npm test` |
+| `pyproject.toml` / `pytest.ini` | `pytest` |
+| `go.mod` | `go test ./...` |
