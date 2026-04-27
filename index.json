@@ -13,5 +13,10 @@
     "name": "skill-publish",
     "description": "Validates, tests, and publishes a skill to a registry.",
     "path": "skill-publish"
+  },
+  {
+    "name": "testcase-skill",
+    "description": "",
+    "path": "testcase-skill"
   }
 ]
