@@ -13,7 +13,7 @@ compatibility:
 metadata:
   author: osapiens engineering
   category: tooling
-  version: "1.0.0"
+  version: "1.2.0"
 scripts:
   - name: validate
     path: scripts/validate.sh

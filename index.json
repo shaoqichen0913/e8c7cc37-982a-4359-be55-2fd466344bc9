@@ -11,7 +11,7 @@
   },
   {
     "name": "skill-publish",
-    "description": "Validates, tests, and publishes a skill to a registry.",
+    "description": "Validates, tests, and publishes a skill to a registry. Use this skill when asked to publish, release, or submit a skill \u2014 including skills created with Codex's skill creator or any folder following the SKILL.md format. Ensures format compliance and script tests pass before pushing to the registry. Activates for queries like \"publish this skill\", \"release my skill\", \"submit skill to registry\".",
     "path": "skills/skill-publish"
   },
   {
