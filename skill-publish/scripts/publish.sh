@@ -68,14 +68,13 @@ if [[ -d "$DEST" ]]; then
   fi
 
   echo "  Updating existing skill '$SKILL_NAME'..."
-  rm -rf "$DEST"
 else
   echo "  Adding new skill '$SKILL_NAME'..."
+  mkdir -p "$DEST"
 fi
 
-# Copy skill folder, excluding framework-internal files
-cp -r "$SKILL_PATH" "$DEST"
-rm -f "$DEST/_framework.json"
+# Sync skill folder, excluding framework-internal files
+rsync -a --delete --exclude="_framework.json" "$SKILL_PATH/" "$DEST/"
 
 # ── Update index.json ────────────────────────────────────────────────────────
 INDEX="$TMP_DIR/registry/index.json"
