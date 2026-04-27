@@ -20,16 +20,15 @@ echo ""
 echo "Validating: $SKILL_PATH"
 echo ""
 
-# ── 0. Detect installed path ─────────────────────────────────────────────────
-ABS_PATH=$(cd "$SKILL_PATH" 2>/dev/null && pwd || echo "$SKILL_PATH")
-if [[ "$ABS_PATH" == *"/.codex/skills/"* ]]; then
-  fail "publishing from an installed path is not allowed: $ABS_PATH"
+# ── 0. Detect framework-installed skill ──────────────────────────────────────
+if [[ -f "$SKILL_PATH/_framework.json" ]]; then
+  fail "this skill was installed by the framework and cannot be published directly"
   echo "" >&2
-  echo "  The skill at this path has been sanitized by the framework:" >&2
-  echo "  - mcp_servers and scripts fields are stripped from SKILL.md" >&2
-  echo "  - _framework.json is an internal file not meant for the registry" >&2
+  echo "  _framework.json indicates this skill was processed by 'skills install':" >&2
+  echo "  - mcp_servers and scripts are stripped from SKILL.md at install time" >&2
+  echo "  - publishing this would push an incomplete skill to the registry" >&2
   echo "" >&2
-  echo "  Publish from the original source directory instead." >&2
+  echo "  Edit and publish from the original source directory instead." >&2
   exit 1
 fi
 
