@@ -13,19 +13,8 @@ compatibility:
 metadata:
   author: osapiens engineering
   category: retrieval
-  version: "1.0.0"
+  version: "1.1.0"
 mcp_servers:
-  - name: brave_search
-    transport: stdio
-    command: npx
-    args: ["-y", "@brave/brave-search-mcp-server"]
-    env_vars: [BRAVE_API_KEY]
-    enabled_tools:
-      - web_search
-      - summarize
-    description: Web search via Brave Search API — used for current information and external docs
-    required: false
-
   - name: notion
     transport: http
     url: https://mcp.notion.com/mcp
@@ -41,7 +30,7 @@ mcp_servers:
 
 # Knowledge Retriever
 
-Retrieve and synthesize information from internal documentation and web search.
+Retrieve and synthesize information from internal documentation and the web.
 
 ## When to use
 
@@ -54,9 +43,9 @@ Activate this skill when the user needs to:
 
 ## How to use this skill
 
-### Searching internal documentation (Notion)
+### 1. Check internal documentation first (Notion)
 
-Use the `notion` MCP tools to search the internal workspace:
+Always start with Notion for anything that may be org-specific:
 
 ```
 notion.search({ query: "<topic>" })
@@ -64,40 +53,26 @@ notion.retrieve_page({ page_id: "<id>" })
 notion.retrieve_block_children({ block_id: "<id>" })
 ```
 
-**Source selection rule:** Prefer Notion results for anything that is:
-- Team-specific (processes, architecture decisions, on-call runbooks)
-- Versioned internally (internal API contracts, environment configs)
-- More recent than the web result (Notion updates outpace docs sites)
+Prefer Notion results for:
+- Team processes, architecture decisions, on-call runbooks
+- Internal API contracts and environment configs
+- Any topic where the org's decision overrides generic advice
 
-### Searching the web (Brave Search)
+### 2. Use Codex web search for external information
 
-Use the `brave_search` MCP tools for external queries:
+Use your built-in web search for anything not covered by internal docs:
 
-```
-brave_search.web_search({ query: "<topic>", count: 5 })
-brave_search.summarize({ url: "<result_url>" })
-```
-
-**Source selection rule:** Prefer web search for:
 - Open-source library documentation and changelogs
 - Industry best practices and standards (RFCs, OWASP, etc.)
 - Recent news or announcements (releases, deprecations, CVEs)
 
 ## Synthesis guidelines
 
-1. **Check Notion first** for internal context — the org's decisions override generic advice
-2. **Cross-reference with web** when the internal docs are silent or outdated
+1. **Check Notion first** — internal decisions override generic advice
+2. **Fall back to web search** when internal docs are silent or outdated
 3. **Cite sources** in your response: Notion page title + URL, or web result URL
 4. **Resolve conflicts** by preferring the more recent source, noting the discrepancy
 
-## Required environment variables
-
-| Variable | MCP Server | Purpose |
-|---|---|---|
-| `BRAVE_API_KEY` | `brave_search` | Brave Search API authentication |
+## Setup
 
 The `notion` MCP uses OAuth — run `codex mcp login notion` once to authenticate.
-
-## References
-
-- [Source selection heuristics](./references/source-selection.md)
