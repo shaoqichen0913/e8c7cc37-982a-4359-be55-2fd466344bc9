@@ -4,7 +4,7 @@ import json
 import os
 import re
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 INDEX_PATH = os.path.join(ROOT, "index.json")
 README_PATH = os.path.join(ROOT, "README.md")
 

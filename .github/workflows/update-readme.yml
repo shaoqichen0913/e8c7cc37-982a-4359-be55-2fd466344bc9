@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "index.json"
-      - "*/SKILL.md"
+      - "skills/*/SKILL.md"
 
 jobs:
   update-readme:
@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Regenerate skill table
-        run: python3 scripts/gen-readme.py
+        run: python3 .github/scripts/gen-readme.py
 
       - name: Commit if changed
         run: |
