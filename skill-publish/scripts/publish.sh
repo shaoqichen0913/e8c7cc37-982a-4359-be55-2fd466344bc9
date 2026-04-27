@@ -60,12 +60,22 @@ DEST="$TMP_DIR/registry/$SKILL_NAME"
 IS_UPDATE=false
 if [[ -d "$DEST" ]]; then
   IS_UPDATE=true
+
+  # Warn if version hasn't changed
+  PREV_VERSION=$(grep -m1 'version:' "$DEST/SKILL.md" 2>/dev/null | sed 's/.*version:[[:space:]]*//' | tr -d '"' || echo "")
+  if [[ -n "$VERSION" && -n "$PREV_VERSION" && "$VERSION" == "$PREV_VERSION" ]]; then
+    echo "  ⚠ Version is still $VERSION — consider bumping metadata.version before publishing." >&2
+  fi
+
   echo "  Updating existing skill '$SKILL_NAME'..."
   rm -rf "$DEST"
 else
   echo "  Adding new skill '$SKILL_NAME'..."
 fi
+
+# Copy skill folder, excluding framework-internal files
 cp -r "$SKILL_PATH" "$DEST"
+rm -f "$DEST/_framework.json"
 
 # ── Update index.json ────────────────────────────────────────────────────────
 INDEX="$TMP_DIR/registry/index.json"
