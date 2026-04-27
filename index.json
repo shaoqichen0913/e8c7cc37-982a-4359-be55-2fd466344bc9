@@ -8,5 +8,10 @@
     "name": "knowledge-retriever",
     "description": "Retrieves information from internal documentation and web search.",
     "path": "knowledge-retriever"
+  },
+  {
+    "name": "skill-publish",
+    "description": "Validates, tests, and publishes a skill to a registry.",
+    "path": "skill-publish"
   }
 ]

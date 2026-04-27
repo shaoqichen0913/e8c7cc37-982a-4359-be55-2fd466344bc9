@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# validate.sh — check SKILL.md schema compliance and format conventions
+set -euo pipefail
+
+SKILL_PATH="${1:-}"
+if [[ -z "$SKILL_PATH" ]]; then
+  echo "Usage: validate.sh <skill-path>" >&2
+  exit 1
+fi
+
+SKILL_MD="$SKILL_PATH/SKILL.md"
+ERRORS=0
+WARNINGS=0
+
+fail() { echo "  ✗ $*" >&2; ((ERRORS++)); }
+warn() { echo "  ⚠ $*"; ((WARNINGS++)); }
+ok()   { echo "  ✓ $*"; }
+
+echo ""
+echo "Validating: $SKILL_PATH"
+echo ""
+
+# ── 1. SKILL.md exists ──────────────────────────────────────────────────────
+if [[ ! -f "$SKILL_MD" ]]; then
+  fail "SKILL.md not found"
+  exit 1
+fi
+ok "SKILL.md found"
+
+# ── 2. Framework schema validation ──────────────────────────────────────────
+if command -v skills &>/dev/null; then
+  if skills validate "$SKILL_PATH" &>/dev/null; then
+    ok "Schema valid (skills validate)"
+  else
+    fail "Schema invalid — run 'skills validate $SKILL_PATH' for details"
+  fi
+else
+  warn "skills CLI not found — skipping schema check"
+fi
+
+# ── 3. Naming convention ─────────────────────────────────────────────────────
+NAME=$(grep -m1 '^name:' "$SKILL_MD" | sed 's/name:[[:space:]]*//')
+if [[ -z "$NAME" ]]; then
+  fail "name field is missing in frontmatter"
+elif [[ "$NAME" =~ [A-Z_\ ] ]]; then
+  fail "name '$NAME' must be kebab-case (lowercase, hyphens only)"
+else
+  ok "name '$NAME' is kebab-case"
+fi
+
+# ── 4. Description length ────────────────────────────────────────────────────
+DESC=$(awk '/^description:/{found=1; next} found && /^[a-z]/{print; exit} found && /^  /{gsub(/^  /, ""); printf $0" "} /^[a-zA-Z]/ && found{exit}' "$SKILL_MD" | tr -d '\n')
+DESC_LEN=${#DESC}
+if [[ $DESC_LEN -gt 200 ]]; then
+  warn "description is $DESC_LEN chars (recommended: under 200)"
+else
+  ok "description length OK ($DESC_LEN chars)"
+fi
+
+# ── 5. Required body section ─────────────────────────────────────────────────
+if grep -q "## When to use" "$SKILL_MD"; then
+  ok "'## When to use' section present"
+else
+  fail "missing '## When to use' section in SKILL.md body"
+fi
+
+# ── 6. Semver version ────────────────────────────────────────────────────────
+VERSION=$(grep -m1 'version:' "$SKILL_MD" | grep -v '^name:' | sed 's/.*version:[[:space:]]*//' | tr -d '"' || true)
+if [[ -z "$VERSION" ]]; then
+  warn "metadata.version not set (recommended: semver like 1.0.0)"
+elif [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  warn "metadata.version '$VERSION' is not semver (expected: X.Y.Z)"
+else
+  ok "version '$VERSION' is semver"
+fi
+
+# ── 7. Scripts executable ────────────────────────────────────────────────────
+if [[ -d "$SKILL_PATH/scripts" ]]; then
+  for script in "$SKILL_PATH/scripts/"*.sh; do
+    [[ -f "$script" ]] || continue
+    if [[ -x "$script" ]]; then
+      ok "$(basename "$script") is executable"
+    else
+      fail "$(basename "$script") is not executable — run: chmod +x $script"
+    fi
+  done
+fi
+
+# ── Summary ──────────────────────────────────────────────────────────────────
+echo ""
+if [[ $ERRORS -gt 0 ]]; then
+  echo "$ERRORS error(s) found — fix before publishing."
+  exit 1
+elif [[ $WARNINGS -gt 0 ]]; then
+  echo "$WARNINGS warning(s) — skill can be published but consider addressing them."
+  exit 0
+else
+  echo "All checks passed."
+  exit 0
+fi
