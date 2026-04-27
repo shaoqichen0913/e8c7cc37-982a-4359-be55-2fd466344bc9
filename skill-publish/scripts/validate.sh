@@ -41,10 +41,15 @@ ok "SKILL.md found"
 
 # ── 2. Framework schema validation ──────────────────────────────────────────
 if command -v skills &>/dev/null; then
-  if skills validate "$SKILL_PATH" &>/dev/null; then
-    ok "Schema valid (skills validate)"
+  VALIDATE_OUTPUT=$(skills validate "$SKILL_PATH" 2>&1)
+  VALIDATE_EXIT=$?
+  if [[ $VALIDATE_EXIT -eq 0 ]]; then
+    ok "Schema valid"
   else
-    fail "Schema invalid — run 'skills validate $SKILL_PATH' for details"
+    fail "Schema invalid — fix the following before publishing:"
+    echo "$VALIDATE_OUTPUT" | grep -E "^\s+-" | while IFS= read -r line; do
+      echo "    $line" >&2
+    done
   fi
 else
   warn "skills CLI not found — skipping schema check"
