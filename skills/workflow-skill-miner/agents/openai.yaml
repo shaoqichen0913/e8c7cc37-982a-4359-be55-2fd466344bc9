@@ -1,0 +1,4 @@
+interface:
+  display_name: "Workflow Skill Miner"
+  short_description: "Analyze prior work and recommend high-value Codex skills."
+  default_prompt: "Analyze my recent history and work artifacts, then recommend what should be packaged as Codex skills to improve readiness, transparency, auditability, security, reproducibility, and related workflow qualities."
