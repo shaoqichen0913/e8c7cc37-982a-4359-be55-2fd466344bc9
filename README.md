@@ -2,6 +2,8 @@
 
 A registry of agent skills compatible with the skill framework.
 
+**Framework source & CLI:** [shaoqichen0913/2f58d6df-b510-43fa-bf34-e46a9749deda](https://github.com/shaoqichen0913/2f58d6df-b510-43fa-bf34-e46a9749deda)
+
 ## Available skills
 
 | Name | Description |
