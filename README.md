@@ -11,6 +11,7 @@ A registry of agent skills compatible with the skill framework.
 | `code-reviewer` | Reviews code for quality, security issues, and style violations. |
 | `knowledge-retriever` | Retrieves relevant information from internal documentation and the web to answer engineering questions. |
 | `skill-publish` | Validates, tests, and publishes a skill to a registry. |
+| `skill-validator` | Security-scans a skill before installation. |
 | `testcase-skill` | Generates and runs test cases for a given function or module. |
 | `workflow-skill-miner` | Analyze prior work and history to recommend repeatable workflows that should become Codex skills, with evidence, scoring, and governance criteria. |
 
