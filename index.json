@@ -1,7 +1,7 @@
 [
   {
     "name": "code-reviewer",
-    "description": "Reviews code for quality, security issues, and style violations. Use this skill when asked to review, audit, check, or analyze code \u2014 including pull requests, individual files, or entire modules. Activates for queries like \"review this code\", \"check for security issues\", \"audit my PR\", \"find bugs in\", \"lint\", \"look for code smells\", or \"is this implementation correct\". Can also run static analysis scripts directly on local files.",
+    "description": "Reviews code for quality, security issues, and style violations. Use this skill when asked to review, audit, check, or analyze code — including pull requests, individual files, or entire modules. Activates for queries like \"review this code\", \"check for security issues\", \"audit my PR\", \"find bugs in\", \"lint\", \"look for code smells\", or \"is this implementation correct\". Can also run static analysis scripts directly on local files.",
     "path": "skills/code-reviewer"
   },
   {
@@ -11,7 +11,7 @@
   },
   {
     "name": "skill-publish",
-    "description": "Validates, tests, and publishes a skill to a registry. Use this skill when asked to publish, release, or submit a skill \u2014 including skills created with Codex's skill creator or any folder following the SKILL.md format. Ensures format compliance and script tests pass before pushing to the registry. Activates for queries like \"publish this skill\", \"release my skill\", \"submit skill to registry\".",
+    "description": "Validates, tests, and publishes a skill to a registry. Use this skill when asked to publish, release, or submit a skill — including skills created with Codex's skill creator or any folder following the SKILL.md format. Ensures format compliance and script tests pass before pushing to the registry. Activates for queries like \"publish this skill\", \"release my skill\", \"submit skill to registry\".",
     "path": "skills/skill-publish"
   },
   {
@@ -23,5 +23,10 @@
     "name": "workflow-skill-miner",
     "description": "Analyze prior work and history to recommend repeatable workflows that should become Codex skills, with evidence, scoring, and governance criteria.",
     "path": "skills/workflow-skill-miner"
+  },
+  {
+    "name": "skill-validator",
+    "description": "Security-scans a skill before installation. Detects injection patterns, credential theft, reverse shells, hardcoded secrets, and suspicious network access in skill scripts and SKILL.md. Use this skill when given a skill link, path, or name and asked whether it is safe to install. Activates for queries like \"is this skill safe to install\", \"scan this skill\", \"check skill for security issues\", \"validate skill before installing\", \"audit this skill\".",
+    "path": "skills/skill-validator"
   }
 ]
